@@ -1,0 +1,48 @@
+[package]
+name = "velox"
+version = "0.1.0"
+edition = "2021" # Note: 2024 is technically in preview/nightly, 2021 is stable.
+
+[dependencies]
+# Heavy lifter for CPU, RAM and Process Data
+sysinfo = "0.30" 
+wmi = "0.13"
+strum = "0.28"
+strum_macros = "0.28"
+
+# Official MS bindings for Registry and Hardware IO
+# Added the DeviceAndDriverInstallation feature here:
+windows = { version = "0.52", features = [
+    "Win32_System_SystemInformation",
+    "Win32_System_Registry",
+    "Win32_System_Threading",
+    "Win32_Foundation",
+    "Win32_Storage_FileSystem",
+    "Win32_Devices_DeviceAndDriverInstallation",
+] }
+
+# Error handling and Data serialization
+anyhow = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+chrono = "0.4"
+
+# Logging for the "Scan" phase
+log = "0.4"
+env_logger = "0.10"
+
+# Added winreg back just in case you prefer the high-level registry API
+# though our 'Senior' approach currently uses the raw Windows crate.
+winreg = "0.52"
+
+
+#UI
+ratatui = "0.26"
+crossterm = "0.27"
+
+[profile.release]
+opt-level = 3
+lto = true           # link-time optimization — reduces binary size significantly
+codegen-units = 1    # single codegen unit — slower compile, better optimization
+strip = true         # strip debug symbols from final binary
+panic = "abort"      # no stack unwinding machinery — smaller binary
